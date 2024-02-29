@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sledování Fitness Aktivit</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url(gym.jpg);
+    background-size: cover;
+  }
+  header {
+    background-color: #000000;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #ffffff;
+    display: flex; 
+    flex-direction: column;
+  }
+  form {
+    margin-bottom: 4rem;
+  }
+  .activities-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+    ;
+  }
+  .activity-item {
+    border-bottom: 2px solid #ccc;
+    padding: 2rem 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sledování Fitness Aktivit</h1>
+</header>
+
+<div class="container">
+  <section id="summary">
+    <h2>Přehled aktuálního týdne</h2>
+    <p>Celkový počet cvičení: <span id="total-exercises">0</span></p>
+    <p>Celkový čas strávený cvičením: <span id="total-time">0</span> minut</p>
+  </section>
+
+  <section id="record-activity">
+    <h2>Záznam Aktivity</h2>
+    <form id="activity-form">
+      <label for="activity-type">Typ aktivity:</label><br>
+      <input type="text" id="activity-type" required><br>
+      <label for="duration">Doba trvání (minuty):</label><br>
+      <input type="number" id="duration" required><br>
+      <label for="distance">Vzdálenost v km (volitelně):</label><br>
+      <input type="number" id="distance"><br>
+      <label for="date">Datum:</label><br> 
+      <input type="date" id="date" required><br> 
+      <label for="notes">Poznámky:</label><br>
+      <textarea id="notes"></textarea><br>
+      <button type="submit">Zaznamenat aktivitu</button>
+    </form>
+  </section>
+
+  <section id="activity-history">
+    <h2>Historie Aktivit</h2>
+    <select id="filter-type">
+      <option value="">Všechny typy</option>
+      <option value="běh">Běh</option>
+      <option value="jízda-na-kole">Jízda na kole</option>
+      <option value="plavání">Plavání</option>
+      <option value="posilování">Posilování</option>
+    </select><br>
+    <input type="date" id="filter-date"><br>
+    <button onclick="filterActivities()">Filtrovat</button><br>
+    <ul class="activities-list" id="activities-list">
+   
+    </ul>
+  </section>
+</div>
+
+<script>
+  const activityForm = document.getElementById('activity-form');
+  const activitiesList = document.getElementById('activities-list');
+  const totalExercises = document.getElementById('total-exercises');
+  const totalTime = document.getElementById('total-time');
+
+  let activities = [];
+
+  activityForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const activityType = document.getElementById('activity-type').value;
+    const duration = parseInt(document.getElementById('duration').value);
+    const distance = document.getElementById('distance').value;
+    const date = document.getElementById('date').value; 
+    const notes = document.getElementById('notes').value;
+
+    activities.push({ type: activityType, duration: duration, distance: distance, date: date, notes: notes }); 
+
+    updateSummary();
+    updateActivityHistory();
+
+    activityForm.reset();
+  });
+
+  function updateSummary() {
+    let totalDuration = 0;
+    activities.forEach(activity => {
+      totalDuration += activity.duration;
+    });
+    totalExercises.textContent = activities.length;
+    totalTime.textContent = totalDuration;
+  }
+
+  function updateActivityHistory() {
+    activitiesList.innerHTML = '';
+    activities.forEach(activity => {
+      const item = document.createElement('li');
+      item.classList.add('activity-item');
+      item.textContent = `${activity.type} - ${activity.duration} minut - ${activity.date}`; 
+      activitiesList.appendChild(item);
+    });
+  }
+
+  function filterActivities() {
+    const type = document.getElementById('filter-type').value;
+    const date = document.getElementById('filter-date').value;
+    let filteredActivities = activities;
+    if (type) {
+      filteredActivities = filteredActivities.filter(activity => activity.type === type);
+    }
+    if (date) {
+      filteredActivities = filteredActivities.filter(activity => {
+        return activity.date === date;
+      });
+    }
+    updateFilteredActivities(filteredActivities);
+  }
+
+  function updateFilteredActivities(filteredActivities) {
+    activitiesList.innerHTML = '';
+    filteredActivities.forEach(activity => {
+      const item = document.createElement('li');
+      item.classList.add('activity-item');
+      item.textContent = `${activity.type} - ${activity.duration} minut - ${activity.date}`; 
+      activitiesList.appendChild(item);
+    });
+  }
+</script>
+
+</body>
+</html>
